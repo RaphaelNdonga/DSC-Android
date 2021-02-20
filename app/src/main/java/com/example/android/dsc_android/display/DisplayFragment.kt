@@ -7,8 +7,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.android.dsc_android.R
+import com.example.android.dsc_android.data.StudentDao
+import com.example.android.dsc_android.data.StudentData
+import com.example.android.dsc_android.data.StudentDatabase
 import com.example.android.dsc_android.databinding.DisplayFragmentBinding
 
 class DisplayFragment : Fragment() {
@@ -28,26 +32,30 @@ class DisplayFragment : Fragment() {
      * View binding is whereby android generates a class containing all the views at compile time.
      * Why is this necessary?
      */
-    private lateinit var binding:DisplayFragmentBinding
+    private lateinit var binding: DisplayFragmentBinding
+    private lateinit var dao: StudentDao
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DisplayFragmentBinding.inflate(inflater,container,false)
+        binding = DisplayFragmentBinding.inflate(inflater, container, false)
+        dao = StudentDatabase.initializeDatabase(requireContext()).dao()
+        viewModel =
+            ViewModelProvider(this, DisplayViewModelFactory(dao)).get(DisplayViewModel::class.java)
+
+        val adapter = StudentsAdapter()
+        viewModel.studentList.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
+        })
+        binding.recyclerView.adapter = adapter
 
         binding.fab.setOnClickListener {
-            Log.i("DisplayFragment","fab has been clicked")
+            Log.i("DisplayFragment", "fab has been clicked")
             findNavController().navigate(DisplayFragmentDirections.actionDisplayFragmentToInputFragment())
         }
 
         return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(DisplayViewModel::class.java)
-        // TODO: Use the ViewModel
     }
 
 }
