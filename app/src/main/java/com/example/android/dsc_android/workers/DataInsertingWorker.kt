@@ -20,7 +20,7 @@ class DataInsertingWorker(appContext: Context, workerParameters: WorkerParameter
         val calendar = Calendar.getInstance()
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
-        val text = "The hourly worker saved this at $hour:$minute"
+        val text = "The worker saved this at $hour:$minute"
         val dataClass = StudentData(name = text, course = "Worker")
 
         dao.insert(dataClass)
